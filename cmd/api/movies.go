@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/nourbol/greenlight/internal/data"
+	"github.com/nourbol/greenlight/internal/validator"
 	"net/http"
 	"time"
 )
@@ -19,6 +20,19 @@ func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Reques
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	movie := &data.Movie{
+		Title:   input.Title,
+		Year:    input.Year,
+		Runtime: input.Runtime,
+		Genres:  input.Genres,
+	}
+
+	v := validator.New()
+	if data.ValidateMovie(v, movie); !v.Valid() {
+		app.failedValidationResponse(w, r, v.Errors)
 		return
 	}
 
