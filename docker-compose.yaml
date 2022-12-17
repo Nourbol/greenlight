@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: greenlight-api
+    ports:
+      - "4000:4000"
+    build: .
+    depends_on:
+      - db
+    entrypoint: [ "go", "run", "./cmd/api",
+                  "-db-dsn=postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/greenlight" ]
+
+  db:
+    image: postgres:13.5
+    container_name: greenlight-db
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - greenlight:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "greenlight"
+      POSTGRES_USER: "${DB_ROOT_USER}"
+      POSTGRES_PASSWORD: "${DB_ROOT_PASS}"
+
+  migrate:
+    image: migrate/migrate
+    container_name: greenlight-migrate
+    depends_on:
+      - db
+    restart: on-failure
+    volumes:
+      - ./migrations:/migrations
+    command: [ "-path", "/migrations", "-database",
+               "postgres://${DB_ROOT_USER}:${DB_ROOT_PASS}@db/greenlight?sslmode=disable", "up", "1" ]
+
+volumes:
+  greenlight:
