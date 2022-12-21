@@ -1,1 +1,0 @@
-ALTER TABLE movies ALTER COLUMN version SET DATA TYPE integer;
