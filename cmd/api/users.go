@@ -2,8 +2,11 @@ package main
 
 import (
 	"errors"
+	//"errors"
 	"github.com/nourbol/greenlight/internal/data"
 	"github.com/nourbol/greenlight/internal/validator"
+
+	//"github.com/nourbol/greenlight/internal/validator"
 	"net/http"
 )
 
@@ -42,6 +45,15 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		default:
 			app.serverErrorResponse(w, r, err)
 		}
+		return
+	}
+	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+	err = app.mailer.Send(user.Email, "user_welcome.tmpl", user)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 	err = app.writeJSON(w, http.StatusCreated, envelope{"user": user}, nil)
