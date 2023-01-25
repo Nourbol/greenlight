@@ -2,11 +2,8 @@ package main
 
 import (
 	"errors"
-	//"errors"
 	"github.com/nourbol/greenlight/internal/data"
 	"github.com/nourbol/greenlight/internal/validator"
-
-	//"github.com/nourbol/greenlight/internal/validator"
 	"net/http"
 )
 
